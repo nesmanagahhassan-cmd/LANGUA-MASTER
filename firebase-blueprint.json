@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public learner profile with learning statistics, current target language and levels.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user" },
+        "displayName": { "type": "string", "description": "Display name of the learner" },
+        "photoURL": { "type": "string", "description": "Avatar image URL" },
+        "currentLanguage": { "type": "string", "description": "L2 Language target, e.g. English, French, Spanish, German" },
+        "currentLevel": { "type": "string", "description": "Current proficiency level (Beginner, Intermediate, Advanced)" },
+        "xp": { "type": "integer", "description": "Accumulated experience points" },
+        "streak": { "type": "integer", "description": "Consecutive active learning days" },
+        "lastActiveDate": { "type": "string", "description": "ISO date string of last activity" },
+        "unlockedAwards": { "type": "array", "description": "List of unlocked trophy IDs" }
+      },
+      "required": ["uid", "displayName", "photoURL", "currentLanguage", "currentLevel", "xp", "streak"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Isolated collection containing sensitive user PII.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Learner's email address" },
+        "role": { "type": "string", "description": "User tier, e.g., standard, premium" }
+      },
+      "required": ["email", "role"]
+    },
+    "LearnedWord": {
+      "title": "LearnedWord",
+      "description": "Vocabulary items saved, practicing or mastered by the learner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique vocabulary identifier" },
+        "word": { "type": "string", "description": "The Foreign Word" },
+        "translation": { "type": "string", "description": "Translation in L1, e.g. Arabic" },
+        "pronunciation": { "type": "string", "description": "Phonetic sounds guides" },
+        "exampleSentence": { "type": "string", "description": "Sample usage in sentence" },
+        "exampleTranslation": { "type": "string", "description": "Sample sentence L1 translation" },
+        "masteryLevel": { "type": "integer", "description": "0 for new, 1 for active, 2 for mastered" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp for spaced repetition timing" }
+      },
+      "required": ["id", "word", "translation", "masteryLevel", "updatedAt"]
+    },
+    "ConversationScenario": {
+      "title": "ConversationScenario",
+      "description": "Scenario session of chat practice with the Gemini bot.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Internal chat session ID" },
+        "scenarioId": { "type": "string", "description": "Identifier of Preset Scenario (e.g. airport_checkin, order_coffee)" },
+        "scenarioTitle": { "type": "string", "description": "Human title of prompt scenario" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last message timestamp" },
+        "score": { "type": "integer", "description": "Vocabulary/fluency score assessed by Gemini (1-100)" },
+        "evaluationFeedback": { "type": "string", "description": "Evaluative feedback comments generated of the chat" }
+      },
+      "required": ["id", "scenarioId", "scenarioTitle", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A single text message exchanged during an AI-powered dialog session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique message ID" },
+        "sender": { "type": "string", "description": "user or ai" },
+        "content": { "type": "string", "description": "The textual body of communication" },
+        "feedback": { "type": "string", "description": "Grammar and phrasing correction comments, if any" },
+        "timestamp": { "type": "string", "description": "ISO timestamp of communication" }
+      },
+      "required": ["id", "sender", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Retrieves public profile information of learners."
+    },
+    "/users/{userId}/private/info": {
+      "schema": "UserPrivateInfo",
+      "description": "Isolated partition containing highly protected PII information."
+    },
+    "/users/{userId}/words/{wordId}": {
+      "schema": "LearnedWord",
+      "description": "Accesses or archives vocabulary items mastered."
+    },
+    "/users/{userId}/chats/{chatId}": {
+      "schema": "ConversationScenario",
+      "description": "Preset dialogues practice workspace sessions with foreign native bots."
+    },
+    "/users/{userId}/chats/{chatId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Chronological speech elements containing interactive lines of dialog."
+    }
+  }
+}

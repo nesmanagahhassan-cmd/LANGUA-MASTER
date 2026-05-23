@@ -1,0 +1,6 @@
+{
+  "name": "تطبيق تعلم اللغات",
+  "description": "منصة احترافية متكاملة لتعلم اللغات الأجنبية مع ميزات حفظ التقدم عبر Firebase، نطق الكلمات والجمل صوتياً، تحديات يومية ومسارات مستويات، ومحادثات تفاعلية واقعية مدعومة بالذكاء الاصطناعي.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

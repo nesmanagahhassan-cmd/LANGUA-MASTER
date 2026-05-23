@@ -1,0 +1,11 @@
+{
+  "apiKey": "AIzaSyC56Ayln2sHkZLJaA68Y3lPrSK9DijRI_E",
+  "authDomain": "lang-lrarning.firebaseapp.com",
+  "databaseURL": "https://lang-lrarning-default-rtdb.firebaseio.com",
+  "projectId": "lang-lrarning",
+  "storageBucket": "lang-lrarning.firebasestorage.app",
+  "messagingSenderId": "630032587566",
+  "appId": "1:630032587566:web:72f037ac8e94445a99f8bf",
+  "measurementId": "G-JMB98D46CT",
+  "firestoreDatabaseId": "(default)"
+}

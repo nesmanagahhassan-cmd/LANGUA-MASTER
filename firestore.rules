@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. User Profiles collection
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow create: if isOwner(userId)
+        && incoming().uid == request.auth.uid
+        && incoming().displayName is string && incoming().displayName.size() <= 100
+        && incoming().photoURL is string && incoming().photoURL.size() <= 500
+        && incoming().currentLanguage is string && incoming().currentLanguage.size() <= 50
+        && incoming().currentLevel is string && incoming().currentLevel.size() <= 50
+        && incoming().xp is int
+        && incoming().streak is int;
+      
+      allow update: if isOwner(userId)
+        && incoming().uid == existing().uid
+        && (
+          // Action: Progress updates & Level updates
+          incoming().diff(existing()).affectedKeys().hasOnly(['xp', 'streak', 'currentLanguage', 'currentLevel', 'unlockedAwards', 'lastActiveDate'])
+        );
+      
+      allow delete: if false; // Profile removal prohibited from web app directly
+
+      // 4. Split Isolated Partition for PII (email / subscription)
+      match /private/{docId} {
+        allow get: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && incoming().email == request.auth.token.email
+          && incoming().role is string && incoming().role.size() <= 20;
+        allow delete: if false;
+      }
+
+      // 5. Vocabulary items learned
+      match /words/{wordId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(wordId)
+          && incoming().id == wordId
+          && incoming().word is string && incoming().word.size() <= 200
+          && incoming().translation is string && incoming().translation.size() <= 500
+          && incoming().masteryLevel is int;
+        
+        allow update: if isOwner(userId)
+          && incoming().id == existing().id
+          && incoming().diff(existing()).affectedKeys().hasOnly(['masteryLevel', 'updatedAt', 'pronunciation', 'exampleSentence', 'exampleTranslation']);
+        
+        allow delete: if isOwner(userId);
+      }
+
+      // 6. Conversational scenario chats
+      match /chats/{chatId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(chatId)
+          && incoming().id == chatId
+          && incoming().scenarioId is string && incoming().scenarioId.size() <= 100
+          && incoming().scenarioTitle is string && incoming().scenarioTitle.size() <= 200
+          && incoming().createdAt is string;
+        
+        allow update: if isOwner(userId)
+          && incoming().id == existing().id
+          && incoming().diff(existing()).affectedKeys().hasOnly(['score', 'evaluationFeedback', 'updatedAt']);
+        
+        allow delete: if isOwner(userId);
+
+        // 7. Message items per interaction
+        match /messages/{messageId} {
+          allow read: if isOwner(userId);
+          allow create: if isOwner(userId)
+            && isValidId(messageId)
+            && incoming().id == messageId
+            && incoming().sender is string && (incoming().sender == 'user' || incoming().sender == 'ai')
+            && incoming().content is string && incoming().content.size() <= 5000;
+          
+          allow update: if isOwner(userId)
+            && incoming().id == existing().id
+            && incoming().diff(existing()).affectedKeys().hasOnly(['feedback']);
+          
+          allow delete: if false;
+        }
+      }
+    }
+  }
+}
