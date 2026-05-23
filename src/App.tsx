@@ -468,6 +468,7 @@ export default function App() {
                 onAddXP={handleAddXPPoints}
                 onSaveWordToFirebase={saveVocabularyWordToCloud}
                 savedWordsList={savedWords}
+                onNavigateToChat={() => setActiveTab('chat')}
               />
             ) : (
               <ChatModule

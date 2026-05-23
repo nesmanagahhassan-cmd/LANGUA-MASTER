@@ -11,7 +11,73 @@ interface VocabModuleProps {
   // Firestore sync callbacks
   onSaveWordToFirebase: (word: VocabularyItem) => Promise<void>;
   savedWordsList: VocabularyItem[];
+  onNavigateToChat?: () => void;
 }
+
+// Comprehensive local fallback database for learning target languages offline or on static Vercel deploys
+const CLIENT_FALLBACK_VOCAB: Record<string, Record<string, any[]>> = {
+  English: {
+    Beginner: [
+      { word: "Welcome", translation: "أهلاً وسهلاً", pronunciation: "/ˈwelkəm/", sentence: "Welcome to our beautiful country!", sentenceTranslation: "مرحباً بك في بلدنا الجميل!" },
+      { word: "Journey", translation: "رحلة / مسيرة ممتعة", pronunciation: "/ˈdʒɜːrni/", sentence: "Learning a language is an amazing journey.", sentenceTranslation: "تعلم لغة هو رحلة مذهلة." },
+      { word: "Explore", translation: "يستكشف", pronunciation: "/ɪkˈsplɔːr/", sentence: "Let's explore new words every day.", sentenceTranslation: "دعنا نستكشف كلمات جديدة كل يوم." },
+      { word: "Patience", translation: "الصبر", pronunciation: "/ˈpeɪʃəns/", sentence: "Learning English needs some patience.", sentenceTranslation: "تعلم الإنجليزية يتطلب الصبر." },
+      { word: "Nurture", translation: "يغذي / يرعى الموهبة", pronunciation: "/ˈnɜːrtʃər/", sentence: "We must nurture our pronunciation skills.", sentenceTranslation: "يجب علينا رعاية وتغذية مهارات نطقنا الصوتي." }
+    ],
+    Intermediate: [
+      { word: "Immersive", translation: "غمر تفاعلي / استيعابي", pronunciation: "/ɪˈmɜːsɪv/", sentence: "Immersive learning helps you master languages.", sentenceTranslation: "التعلم الاستيعابي يساعدك على إتقان اللغات." },
+      { word: "Fluency", translation: "الطلاقة والتحدث بمرونة", pronunciation: "/ˈfluːənsi/", sentence: "Daily practice is the key to fluency.", sentenceTranslation: "الممارسة اليومية هي مفتاح الطلاقة." },
+      { word: "Cognitive", translation: "معرفي / إدراكي", pronunciation: "/ˈkɒɡnətɪv/", sentence: "Learning bilingual skills improves cognitive flexibility.", sentenceTranslation: "تعلم المهارات ثنائية اللغة يحسن المرونة المعرفية." },
+      { word: "Articulate", translation: "فصيح / بليغ بالقول", pronunciation: "/ɑːˈtɪkjʊlət/", sentence: "She is an articulate speaker of English.", sentenceTranslation: "إنها متحدثة فصيحة باللغة الإنجليزية." }
+    ],
+    Advanced: [
+      { word: "Serendipity", translation: "صدفة سعيدة / توفيق غير متوقع", pronunciation: "/ˌserənˈdɪpəti/", sentence: "They met by pure serendipity at the library.", sentenceTranslation: "التقوا بالصدفة السعيدة المحضة في المكتبة." },
+      { word: "Quintessential", translation: "جوهري / نموذج مثالي", pronunciation: "/ˌkwɪntɪˈsenʃl/", sentence: "This is the quintessential English cottage.", sentenceTranslation: "هذا هو الكوخ الإنجليزي الأكثر نموذجية وجوهرية." }
+    ]
+  },
+  French: {
+    Beginner: [
+      { word: "Bonjour", translation: "مرحباً / صباح الخير", pronunciation: "/bɔ̃.ʒuʁ/", sentence: "Bonjour mon cher ami!", sentenceTranslation: "صباح الخير يا صديقي العزيز!" },
+      { word: "Merci", translation: "شكراً لك", pronunciation: "/mɛʁ.si/", sentence: "Merci beaucoup pour votre aide précieuse.", sentenceTranslation: "شكراً جزيلاً لك على مساعدتك القيمة." },
+      { word: "Voyage", translation: "سفر / رحلة", pronunciation: "/vwa.jaʒ/", sentence: "Bon voyage à Paris!", sentenceTranslation: "رحلة سعيدة إلى باريس!" }
+    ],
+    Intermediate: [
+      { word: "Apprentissage", translation: "التعلّم / عملية التدريب", pronunciation: "/ap.ʁɑ̃.ti.saʒ/", sentence: "L'apprentissage est un long voyage.", sentenceTranslation: "التعلم رحلة طويلة." },
+      { word: "Améliorer", translation: "يُحسن / يطوّر", pronunciation: "/a.me.ljo.ʁe/", sentence: "Je veux améliorer ma prononciation.", sentenceTranslation: "أريد تحسين نطق الكلمات الخاص بي." },
+      { word: "Bilingue", translation: "ثنائي اللغة", pronunciation: "/bi.lɛ̃ɡ/", sentence: "Devenir bilingue ouvre de nombreuses portes.", sentenceTranslation: "أن تصبح ثنائي اللغة يفتح لك أبواباً كثيرة." }
+    ],
+    Advanced: [
+      { word: "Inébranlable", translation: "راسخ / ثابت لا يتزعزع", pronunciation: "/i.ne.bʁɑ̃.labl/", sentence: "Il a une confiance inébranlable en sa mémoire.", sentenceTranslation: "لديه ثقة راسخة لا تتزعزع في ذاكرته." }
+    ]
+  },
+  Spanish: {
+    Beginner: [
+      { word: "Aprender", translation: "يتعلم", pronunciation: "/a.pɾenˈdeɾ/", sentence: "Quiero aprender español.", sentenceTranslation: "أريد تعلم الإسبانية." },
+      { word: "Hola", translation: "مرحباً", pronunciation: "/ˈo.la/", sentence: "Hola, ¿cómo estás hoy?", sentenceTranslation: "مرحباً، كيف حالك اليوم؟" },
+      { word: "Gracias", translation: "شكراً لك", pronunciation: "/ˈɡɾa.sjas/", sentence: "Muchas gracias por tu amistad.", sentenceTranslation: "شكراً جزيلاً لك على صداقتك." }
+    ],
+    Intermediate: [
+      { word: "Éxito", translation: "النجاح", pronunciation: "/ˈeɡ.si.to/", sentence: "La persistencia lleva al éxito.", sentenceTranslation: "المثابرة تؤدي إلى النجاح." },
+      { word: "Desafío", translation: "التحدي اللغوي القوي", pronunciation: "/de.saˈfi.o/", sentence: "Aprender un idioma es un hermoso desafío.", sentenceTranslation: "تعلم لغة هو تحدٍ جميل." }
+    ],
+    Advanced: [
+      { word: "Inexorable", translation: "حتمي / لا مفر منه", pronunciation: "/in.ek.soˈɾa.βle/", sentence: "El paso del tiempo es inexorable.", sentenceTranslation: "مرور الوقت حتمي ولا مفر منه." }
+    ]
+  },
+  German: {
+    Beginner: [
+      { word: "Hallo", translation: "مرحباً", pronunciation: "/haˈloː/", sentence: "Hallo, mein Name ist Lukas.", sentenceTranslation: "مرحباً، اسمي لوكاس." },
+      { word: "Danke", translation: "شكراً", pronunciation: "/ˈdaŋkə/", sentence: "Vielen danke für alles.", sentenceTranslation: "شكراً جزيلاً على كل شيء." }
+    ],
+    Intermediate: [
+      { word: "Wortschatz", translation: "الثروة اللغوية / المفردات", pronunciation: "/ˈvɔʁtˌʃats/", sentence: "Er erweitert seinen Wortschatz täglich.", sentenceTranslation: "إنّه يوسع ثروته اللغوية يومياً." },
+      { word: "Erfolg", translation: "النجاح المشرق", pronunciation: "/ɛɐ̯ˈfɔlk/", sentence: "Übung bringt Erfolg.", sentenceTranslation: "الممارسة تجلب النجاح." }
+    ],
+    Advanced: [
+      { word: "Ausgezeichnet", translation: "ممتاز / بارز الجودة", pronunciation: "/ˈaʊ̯sɡəˌtsaɪ̯çnət/", sentence: "Ihre Aussprache ist ausgezeichnet.", sentenceTranslation: "نطق الكلمات الخاص بك ممتاز للغاية." }
+    ]
+  }
+};
 
 export default function VocabModule({
   userId,
@@ -19,7 +85,8 @@ export default function VocabModule({
   level,
   onAddXP,
   onSaveWordToFirebase,
-  savedWordsList
+  savedWordsList,
+  onNavigateToChat
 }: VocabModuleProps) {
   const [words, setWords] = useState<VocabularyItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +95,7 @@ export default function VocabModule({
 
   const activeLang = SUPPORTED_LANGUAGES.find((l) => l.id === targetLanguage) || SUPPORTED_LANGUAGES[0];
 
-  // Load new vocabulary word set of the day from backend AI
+  // Load new vocabulary word set of the day from backend AI with fallback mechanics
   const fetchNewWordsOfTheDay = async () => {
     setLoading(true);
     setToastMessage(null);
@@ -38,6 +105,11 @@ export default function VocabModule({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetLanguage, level })
       });
+      
+      if (!resp.ok) {
+        throw new Error(`API returned standard error status ${resp.status}`);
+      }
+
       const data = await resp.json();
       if (data.words && data.words.length > 0) {
         const mapped: VocabularyItem[] = data.words.map((w: any, idx: number) => ({
@@ -55,10 +127,35 @@ export default function VocabModule({
         // Award modest XP for requesting new dictionary words
         onAddXP(5);
         showToast("💡 تم توليد مجموعة كلمات ذكية جديدة للمستوى الحالي!");
+        return;
       }
+      throw new Error("No words array received in response structure");
     } catch (e) {
-      console.error("Failed fetching vocab from Express", e);
-      showToast("❌ حدث خطأ أثناء الاتصال بالخادم الذكي لتوليد الكلمات.");
+      console.warn("Express endpoint failed or returned non-JSON/404. Switching to local interactive database fallback...", e);
+      
+      // Select appropriate fallback list based on language and level
+      const languageMap = CLIENT_FALLBACK_VOCAB[targetLanguage] || CLIENT_FALLBACK_VOCAB["English"];
+      const levelKey = level === "Advanced" ? "Advanced" : level === "Intermediate" ? "Intermediate" : "Beginner";
+      const rawList = languageMap[levelKey] || languageMap["Beginner"];
+      
+      // Shuffle the list and take 3 items always!
+      const shuffled = [...rawList].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3);
+      
+      const mappedFallbacks: VocabularyItem[] = selected.map((w: any, idx: number) => ({
+        id: `${targetLanguage.toLowerCase()}_${w.word.toLowerCase()}_${Date.now()}_${idx}`,
+        word: w.word,
+        translation: w.translation,
+        pronunciation: w.pronunciation || "/---/",
+        sentence: w.sentence || "",
+        sentenceTranslation: w.sentenceTranslation || "",
+        masteryLevel: 0,
+        updatedAt: new Date().toISOString()
+      }));
+
+      setWords(mappedFallbacks);
+      onAddXP(5);
+      showToast("💡 تم تجديد وتوليد الكلمات محلياً وبنجاح تام! (تم التجديد بمرونة)");
     } finally {
       setLoading(false);
     }
@@ -169,11 +266,19 @@ export default function VocabModule({
         <div className="p-2 bg-white rounded-xl text-indigo-600 shadow-sm shrink-0">
           <Sparkles className="w-5 h-5 animate-pulse" />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5 flex-1">
           <h4 className="font-sans font-bold text-slate-800 text-xs sm:text-sm">💬 ممارسة التحدث والتقييم الفوري متوفرة الآن!</h4>
           <p className="text-[11px] font-sans text-slate-600 leading-relaxed">
             لقياس مهارات التحدث والتفاعل والذكاء الاصطناعي، يرجى الانتقال إلى تبويب <strong className="text-indigo-700 font-semibold font-sans">"محادثة الذكاء الاصطناعي 💬"</strong> في الشريط العلوي لتشغيل حوار محاكاة حي والحصول على تصحيح فوري لقواعدك النحوية ونطقك الصوتي!
           </p>
+          {onNavigateToChat && (
+            <button
+              onClick={onNavigateToChat}
+              className="mt-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-sans font-bold rounded-lg shadow-sm cursor-pointer transition-all active:scale-95 duration-100 flex items-center gap-1 shrink-0"
+            >
+              <span>انتقل إلى محادثة الذكاء الاصطناعي الآن 💬 🚀</span>
+            </button>
+          )}
         </div>
       </div>
 
