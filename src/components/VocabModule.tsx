@@ -164,6 +164,19 @@ export default function VocabModule({
         </button>
       </div>
 
+      {/* Dynamic Conversational Reminder Box */}
+      <div className="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-4 flex items-start gap-3.5 shadow-sm">
+        <div className="p-2 bg-white rounded-xl text-indigo-600 shadow-sm shrink-0">
+          <Sparkles className="w-5 h-5 animate-pulse" />
+        </div>
+        <div className="space-y-1">
+          <h4 className="font-sans font-bold text-slate-800 text-xs sm:text-sm">💬 ممارسة التحدث والتقييم الفوري متوفرة الآن!</h4>
+          <p className="text-[11px] font-sans text-slate-600 leading-relaxed">
+            لقياس مهارات التحدث والتفاعل والذكاء الاصطناعي، يرجى الانتقال إلى تبويب <strong className="text-indigo-700 font-semibold font-sans">"محادثة الذكاء الاصطناعي 💬"</strong> في الشريط العلوي لتشغيل حوار محاكاة حي والحصول على تصحيح فوري لقواعدك النحوية ونطقك الصوتي!
+          </p>
+        </div>
+      </div>
+
       {/* Flashcards List Box Container */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {loading ? (

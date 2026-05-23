@@ -332,28 +332,28 @@ export default function App() {
           </div>
 
           {/* Center Navigation Toggle Links */}
-          <nav className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-100 shrink-0">
+          <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-100 shrink-0 select-none">
             <button
               onClick={() => setActiveTab('vocab')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-sans font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'vocab'
-                  ? "bg-white text-indigo-600 shadow-sm"
+                  ? "bg-white text-indigo-700 shadow-sm"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">دروس الكلمات</span>
+              <span>القاموس والكلمات 📖</span>
             </button>
             <button
               onClick={() => setActiveTab('chat')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-sans font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'chat'
-                  ? "bg-white text-indigo-600 shadow-sm"
+                  ? "bg-white text-indigo-700 shadow-sm animate-pulse"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <MessageSquareText className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">محادثات تفاعلية</span>
+              <span>محادثة الذكاء الاصطناعي 💬</span>
             </button>
           </nav>
 

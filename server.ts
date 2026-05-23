@@ -114,28 +114,44 @@ app.post("/api/ai/vocabulary", async (req, res) => {
     const { targetLanguage, level } = req.body;
 
     if (!process.env.GEMINI_API_KEY) {
-      // Return beautiful default words in L2 and L1 depending on chosen target language
+      // Return beautiful default words in L2 and L1 depending on chosen target language, randomized for dynamics
       const fallbackVocab: Record<string, any[]> = {
         English: [
           { word: "Immersive", translation: "غمر تفاعلي / استيعابي", pronunciation: "/ɪˈmɜːsɪv/", sentence: "Immersive learning helps you master languages.", sentenceTranslation: "التعلم الاستيعابي يساعدك على إتقان اللغات." },
           { word: "Fluency", translation: "الطلاقة", pronunciation: "/ˈfluːənsi/", sentence: "Daily practice is the key to fluency.", sentenceTranslation: "الممارسة اليومية هي مفتاح الطلاقة الإملائية." },
-          { word: "Vocabulary", translation: "مفردات لغوية", pronunciation: "/vəˈkæbjʊləri/", sentence: "Write down new vocabulary in your logs.", sentenceTranslation: "اكتب المفردات الجديدة في سجلاتك." }
+          { word: "Vocabulary", translation: "مفردات لغوية", pronunciation: "/vəˈkæbjʊləri/", sentence: "Write down new vocabulary in your logs.", sentenceTranslation: "اكتب المفردات الجديدة في سجلاتك." },
+          { word: "Cognitive", translation: "معرفي / إدراكي", pronunciation: "/ˈkɒɡnətɪv/", sentence: "Learning bilingual skills improves cognitive flexibility.", sentenceTranslation: "تعلم المهارات ثنائية اللغة يحسن المرونة المعرفية." },
+          { word: "Articulate", translation: "فصيح / بليغ", pronunciation: "/ɑːˈtɪkjʊlət/", sentence: "She is an articulate speaker of English.", sentenceTranslation: "إنها متحدثة فصيحة باللغة الإنجليزية." },
+          { word: "Persistence", translation: "المثابرة / الإصرار", pronunciation: "/pəˈsɪstəns/", sentence: "Your persistence in learning will pay off.", sentenceTranslation: "مثابرتك في التعلم ستؤتي ثمارها." },
+          { word: "Comprehend", translation: "يستوعب / يفهم", pronunciation: "/ˌkɒmprɪˈhɛnd/", sentence: "Listen carefully to comprehend native speech.", sentenceTranslation: "استمع بعناية لفهم واستيعاب كلام أهل الكلمة الأصليين." },
+          { word: "Ecolocation", translation: "تحديد الموقع بالصدى", pronunciation: "/ˌɛkoʊloʊˈkeɪʃən/", sentence: "Bats use ecolocation to navigate the night sky.", sentenceTranslation: "تستخدم الخفافيش تحديد الموقع بالصدى للتنقل في سماء الليل." }
         ],
         French: [
           { word: "Apprentissage", translation: "التعلم", pronunciation: "/ap.ʁɑ̃.ti.saʒ/", sentence: "L'apprentissage est un long voyage.", sentenceTranslation: "التعلم رحلة طويلة." },
-          { word: "Courageux", translation: "شجاع", pronunciation: "/ku.ʁa.ʒø/", sentence: "Il faut être courageux pour parler une nouvelle langue.", sentenceTranslation: "يجب أن تكون شجاعاً لتتحدث لغة جديدة." }
+          { word: "Courageux", translation: "شجاع", pronunciation: "/ku.ʁa.ʒø/", sentence: "Il faut être courageux pour parler une nouvelle langue.", sentenceTranslation: "يجب أن تكون شجاعاً لتتحدث لغة جديدة." },
+          { word: "Améliorer", translation: "يُحسن / يطوّر", pronunciation: "/a.me.ljo.ʁe/", sentence: "Je veux améliorer ma prononciation.", sentenceTranslation: "أريد تحسين نطق الكلمات الخاص بي." },
+          { word: "Bilingue", translation: "ثنائي اللغة", pronunciation: "/bi.lɛ̃ɡ/", sentence: "Devenir bilingue ouvre de nombreuses portes.", sentenceTranslation: "أن تصبح ثنائي اللغة يفتح لك أبواباً كثيرة." },
+          { word: "Quotidien", translation: "يومي", pronunciation: "/kɔ.ti.djɛ̃/", sentence: "La pratique quotidienne est indispensable.", sentenceTranslation: "الممارسة اليومية أمر لا غنى عنه." }
         ],
         Spanish: [
           { word: "Aprender", translation: "يتعلم", pronunciation: "/a.pɾenˈdeɾ/", sentence: "Quiero aprender español con fluidez.", sentenceTranslation: "أريد تعلم الإسبانية بطلاقة." },
-          { word: "Éxito", translation: "النجاح", pronunciation: "/ˈeɡ.si.to/", sentence: "La persistencia lleva al éxito.", sentenceTranslation: "المثابرة تؤدي إلى النجاح." }
+          { word: "Éxito", translation: "النجاح", pronunciation: "/ˈeɡ.si.to/", sentence: "La persistencia lleva al éxito.", sentenceTranslation: "المثابرة تؤدي إلى النجاح." },
+          { word: "Desafío", translation: "التحدي", pronunciation: "/de.saˈfi.o/", sentence: "Aprender un idioma es un hermoso desafío.", sentenceTranslation: "تعلم لغة هو تحدٍ جميل." },
+          { word: "Entender", translation: "يفهم", pronunciation: "/en.tenˈdeɾ/", sentence: "Ahora puedo entender mejor las canciones.", sentenceTranslation: "الآن يمكنني فهم الأغاني بشكل أفضل." },
+          { word: "Vocabulario", translation: "المفردات", pronunciation: "/bo.ka.βuˈla.ɾjo/", sentence: "Practico vocabulario nuevo cada mañana.", sentenceTranslation: "أتدرب على مفردات جديدة كل صباح." }
         ],
         German: [
           { word: "Wortschatz", translation: "الثروة اللغوية / المفردات", pronunciation: "/ˈvɔʁtˌʃats/", sentence: "Er erweitert seinen Wortschatz täglich.", sentenceTranslation: "إنّه يوسع ثروته اللغوية يومياً." },
-          { word: "Erfolg", translation: "النجاح", pronunciation: "/ɛɐ̯ˈfɔlk/", sentence: "Übung bringt Erfolg.", sentenceTranslation: "الممارسة تجلب النجاح." }
+          { word: "Erfolg", translation: "النجاح", pronunciation: "/ɛɐ̯ˈfɔlk/", sentence: "Übung bringt Erfolg.", sentenceTranslation: "الممارسة تجلب النجاح." },
+          { word: "Herausforderung", translation: "تحدي / صعوبة ممتعة", pronunciation: "/hɛˈʁaʊ̯sfɔʁdəʁʊŋ/", sentence: "Die Aussprache ist eine kleine Herausforderung.", sentenceTranslation: "النطق يمثل تحدياً صغيراً." },
+          { word: "Verstehen", translation: "يفهم / يستوعب", pronunciation: "/fɛɐ̯/ˈʃteːən/", sentence: "Ich kann dich jetzt gut verstehen.", sentenceTranslation: "أستطيع فهمك جيداً الآن." },
+          { word: "Geduld", translation: "الصبر", pronunciation: "/ɡəˈdʊlt/", sentence: "Sprachenlernen erfordert viel Geduld.", sentenceTranslation: "تعلم اللغات يتطلب الكثير من الصبر." }
         ]
       };
 
-      const selected = fallbackVocab[targetLanguage] || fallbackVocab["English"];
+      const selectedList = fallbackVocab[targetLanguage] || fallbackVocab["English"];
+      const shuffled = [...selectedList].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3);
       return res.json({ words: selected });
     }
 

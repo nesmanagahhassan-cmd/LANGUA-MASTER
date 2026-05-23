@@ -76,6 +76,11 @@ export default function AuthScreen({ onSignInWithGoogle, onContinueAsGuest, load
             <span>تسجيل الدخول الآمن بحساب Google</span>
           </button>
 
+          {/* Iframe popup blocked friendly context hint */}
+          <p className="text-[10px] text-slate-400 text-center font-sans leading-normal">
+            💡 <strong className="font-semibold text-amber-600">تنويه للمعايير الأمنية:</strong> إذا تم حظر النوافذ المنبثقة من قِبل المتصفح داخل المعاينة، يمكنك ببساطة استخدام <span className="font-semibold text-indigo-600">"الاستمرار كزائر"</span> أو فتح التطبيق في نافذة جديدة.
+          </p>
+
           <button
             onClick={onContinueAsGuest}
             disabled={loading}
